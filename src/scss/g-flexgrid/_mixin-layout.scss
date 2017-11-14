@@ -1,0 +1,78 @@
+//this is ultra simple flexbox layout that sets a calc width with margin-right gutters.
+// Can be used for repeated items and a single row 'grid' (ratios), gutters do not repeat on outer edge
+
+@mixin make-flex-list-item($conf: ()) {
+    // Extending the default arguments with the given object
+    $conf: extend((
+        items-per-row: 3,
+        items-per-column:auto,
+        height: auto,
+        gutter: 25px,
+    ), $conf);
+
+    $items-per-row: map-get($conf, items-per-row);
+    $items-per-column: map-get($conf, items-per-column);
+    $gutter: (map-get($conf, gutter));
+
+    margin-right: $gutter;
+    margin-bottom: $gutter;
+
+    @if ($items-per-column == auto) {
+        height: map-get($conf, height);
+
+        @if (type-of($items-per-row) == number) {
+            //grid with  equal sized columns and flexible number of rows.
+            @include grid-equal-width-columns($conf, $items-per-row, $gutter);
+
+        } @else if (type-of(map-get($conf, items-per-row)) == list) {
+            //grid with different sized columns and flexible number of rows.
+            @include grid-ratio-width-columns($conf, $items-per-row, $gutter);
+        }
+    }
+}
+
+@mixin grid-equal-width-columns($conf: (), $itemsX:'error',$gutter:0) { ///im seperating these out to avoid confusion
+
+    //calculate width of equal sized items
+    width: calc((100% - (#{$gutter * ( $itemsX - 1) })) / #{$itemsX});
+    &:nth-child(#{$itemsX}n) {
+        margin-right: 0px;
+    }
+}
+
+@mixin grid-ratio-width-columns($conf: (), $itemsX:'error',$gutter:0) { ///im seperating these out to avoid confusion
+    //total number of items
+    $number-of-items: length($itemsX);
+
+    //count total number of units
+    $totalunits: 0;
+    @each $value in $itemsX {
+        $totalunits: $totalunits + strip-unit($value);
+    }
+
+    @for $i from 1 through length($itemsX) {
+        &:nth-child( #{$i}) {
+            //calculate width of unequal sized items based on ratio.
+            width: calc((100% - (#{$gutter * ( $number-of-items - 1) })) / #{$totalunits / nth($itemsX, $i)});
+            &:nth-child(#{$number-of-items}n) {
+                margin-right: 0px;
+            }
+        }
+    }
+}
+
+@mixin make-flex-list($conf: ()) {
+    // Extending the default arguments with the given object
+    $conf: extend((
+        width: 100%,
+        flex-direction: row,
+        flex-wrap: wrap,
+        align-content: flex-start,
+    ), $conf);
+
+    width: map-get($conf, width);
+    display: flex;
+    flex-direction: map-get($conf, flex-direction);
+    flex-wrap: map-get($conf, flex-wrap);
+    align-content: map-get($conf, align-content);
+}
