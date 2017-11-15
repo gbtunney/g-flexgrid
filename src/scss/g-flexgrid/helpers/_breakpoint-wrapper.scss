@@ -1,0 +1,53 @@
+// Column width with margin
+@mixin column-width($numberColumns: 3) {
+    width: map-get( $columns, $numberColumns ) - ( ( $columns__margin * ( $numberColumns - 1 ) ) / $numberColumns );
+}
+
+@function strip-unit($number) {
+    @if type-of($number) == 'number' and not unitless($number) {
+        @return $number / ($number * 0 + 1);
+    }
+    @return $number;
+}
+
+@mixin vertical-align($position: relative) {
+    position: $position;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+
+@function extend($obj, $ext-obj) {
+    @return map-merge($obj, $ext-obj);
+}
+
+@function contains($list, $item) {
+    @return index($list, $item) != null;
+}
+
+//this is a 'wrapper' for breakpoint slicer's stupid function names. see variables-site/structure
+@mixin breakpoint-range(  $point:sm, $operator: false  ) {
+    @if ($operator == '>=') {
+        @include from($point) {
+            @content;
+        }
+    } @else if ($operator == "<=") {
+        @include to($point) {
+            @content;
+        }
+    } @else if ( $operator == "=") or ($operator == "==") {
+        @include at($point) {
+            @content;
+        }
+    } @else if ($operator == false) {
+        @include at($point) {
+            @content;
+        }
+    } @else if (contains($slicer-breakpoint-names, $operator)) {
+        @include between($point, $operator) {
+            @content;
+        }
+
+    }
+}
