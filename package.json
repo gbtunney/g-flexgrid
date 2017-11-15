@@ -4,14 +4,6 @@
   "description": "Sass layout utility",
   "main": "app.js",
   "dependencies": {},
-  "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/gbtunney/g-flexgrid.git"
-  },
   "devDependencies": {
     "babel-preset-es2015": "^6.22.0",
     "babelify": "^7.3.0",
@@ -55,6 +47,18 @@
     "breakpoint-sass": "^2.7.1",
     "breakpoint-slicer": "^2.0.0"
   },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gbtunney/g-flexgrid.git"
+  },
   "author": "Gillian Tunney",
-  "license": "ISC"
+  "license": "ISC",
+  "email": "gbtunney@gmail.com",
+  "bugs": {
+    "url": "https://github.com/gbtunney/g-flexgrid/issues"
+  },
+  "homepage": "https://github.com/gbtunney/g-flexgrid#readme"
 }
