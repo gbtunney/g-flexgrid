@@ -1,7 +1,8 @@
 //this is ultra simple flexbox layout that sets a calc width with margin-right gutters.
 // Can be used for repeated items and a single row 'grid' (ratios), gutters do not repeat on outer edge
+//Gillian
 
-@mixin make-flex-list-item($conf: ()) {
+@mixin make-flex-list-item($conf: (), $showGuides: true) {
     // Extending the default arguments with the given object
     $conf: extend((
         items-per-row: 3,
@@ -14,8 +15,25 @@
     $items-per-column: map-get($conf, items-per-column);
     $gutter: (map-get($conf, gutter));
 
+    //show guides =true helpful for debugging margins/padding
+    @if ($showGuides == true) {
+        $s-min: 20;
+        $s-max: 70;
+        $l-min: 30;
+        $l-max: 90;
+        border: 2px solid hsl(random(360), $s-min+random($s-max+-$s-min), $l-min+random($l-max+-$l-min));
+    }
     margin-right: $gutter;
     margin-bottom: $gutter;
+
+    @if ($items-per-row == auto) {
+        width: map-get($conf, width); //dont know if this is needed?
+        @if (type-of($items-per-column) == number) {
+            @include grid-equal-height-rows($conf, $items-per-column, $gutter);
+        } @else if (type-of( $items-per-column )== list) {
+            @include grid-ratio-height-rows($conf, $items-per-column, $gutter);
+        }
+    }
 
     @if ($items-per-column == auto) {
         height: map-get($conf, height);
@@ -27,6 +45,37 @@
         } @else if (type-of(map-get($conf, items-per-row)) == list) {
             //grid with different sized columns and flexible number of rows.
             @include grid-ratio-width-columns($conf, $items-per-row, $gutter);
+        }
+    }
+}
+
+@mixin grid-equal-height-rows($conf: (), $itemsY:'error',$gutter:0) { ///im seperating these out to avoid confusion
+
+    //calculate height of equal sized items
+    height: calc((100% - (#{$gutter * ( $itemsY - 1) })) / #{$itemsY});
+    &:nth-child(#{$itemsY}n) {
+        margin-bottom: 0px;
+    }
+}
+
+@mixin grid-ratio-height-rows($conf: (), $itemsY:'error',$gutter:0) { ///im seperating these out to avoid confusion
+
+    //total number of items
+    $number-of-items: length($itemsY);
+
+    //count total number of units
+    $totalunits: 0;
+    @each $value in $itemsY {
+        $totalunits: $totalunits + strip-unit($value);
+    }
+
+    @for $i from 1 through length($itemsY) {
+        &:nth-child( #{$i}) {
+            //calculate height of unequal sized items based on ratio.
+            height: calc((100% - (#{$gutter * ( $number-of-items - 1) })) / #{$totalunits / nth( $itemsY, $i)});
+            &:nth-child(#{$number-of-items}n) {
+                margin-bottom: 0px;
+            }
         }
     }
 }
@@ -75,4 +124,33 @@
     flex-direction: map-get($conf, flex-direction);
     flex-wrap: map-get($conf, flex-wrap);
     align-content: map-get($conf, align-content);
+
 }
+
+/*
+%repeater-post-list-2x3 {
+    //wrapper for list of items that are all the same size.
+    @include make-flex-list((
+        width: auto,
+        flex-direction: column,
+        flex-wrap: wrap,
+    ));
+    $list-configuration: (
+        items-per-row: auto,
+        items-per-column: 3 1,
+        width: 445px,
+        gutter: 10px,
+    );
+    > .grid-item {
+        @include breakpoint-range(md, ">=") { //applied to range of breakpoints md and larger..
+            @include make-flex-list-item($list-configuration);
+        }
+        @include breakpoint-range(sm) { //applied to breakpoint sm
+            @include make-flex-list-item(extend($list-configuration, (items-per-row: 2)));
+        }
+        @include breakpoint-range(xs) {
+            @include make-flex-list-item(extend($list-configuration, (items-per-row: 1,)));
+        }
+    }
+}
+*/

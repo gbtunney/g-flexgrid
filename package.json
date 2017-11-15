@@ -1,6 +1,6 @@
 {
   "name": "g-flexgrid",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Sass layout utility",
   "main": "app.js",
   "dependencies": {},
